@@ -61,4 +61,34 @@ public class ApiV1PostCommentControllerTest {
                     .andExpect(jsonPath("$[%d].post".formatted(i)).doesNotExist());
         }
     }
+
+    @Test
+    @DisplayName("댓글 단건조회")
+    void t2() throws Exception {
+        int postId = 1;
+        int id = 2;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/posts/%d/comments/%d".formatted(postId, id))
+                )
+                .andDo(print());
+
+        Post post = postService.findById(postId).get();
+        PostComment postComment = post.getComments()
+                .stream()
+                .filter(comment -> comment.getId() == id)
+                .findFirst()
+                .get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostCommentController.class))
+                .andExpect(handler().methodName("getItem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(postComment.getId()))
+                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(postComment.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(postComment.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.content").value(postComment.getContent()))
+                .andExpect(jsonPath("$.post").doesNotExist());
+    }
 }
