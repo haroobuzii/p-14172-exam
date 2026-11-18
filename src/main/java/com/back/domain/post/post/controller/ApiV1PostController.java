@@ -4,6 +4,9 @@ import com.back.domain.post.post.dto.PostDto;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import com.back.global.rsData.RsData;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +41,11 @@ public class ApiV1PostController {
     }
 
     public record PostWriteReqBody(
+            @NotBlank
+            @Size(min = 2, max = 100)
             String title,
+            @NotBlank
+            @Size(min = 2, max = 5000)
             String content
     ) {
     }
@@ -46,7 +53,7 @@ public class ApiV1PostController {
     @PostMapping
     @Transactional
     public RsData<PostDto> write(
-            @RequestBody PostWriteReqBody reqBody
+            @RequestBody @Valid PostWriteReqBody reqBody
     ) {
         Post post = postService.write(reqBody.title, reqBody.content);
 
@@ -58,7 +65,11 @@ public class ApiV1PostController {
     }
 
     public record PostModifyReqBody(
+            @NotBlank
+            @Size(min = 2, max = 100)
             String title,
+            @NotBlank
+            @Size(min = 2, max = 5000)
             String content
     ) {
     }
@@ -67,7 +78,7 @@ public class ApiV1PostController {
     @Transactional
     public RsData<Void> modify(
             @PathVariable int id,
-            @RequestBody PostModifyReqBody reqBody
+            @RequestBody @Valid PostModifyReqBody reqBody
     ) {
         Post post = postService.findById(id).get();
 
