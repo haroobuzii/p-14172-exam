@@ -62,4 +62,36 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.data.title").value("제목"))
                 .andExpect(jsonPath("$.data.content").value("내용"));
     }
+
+    @Test
+    @DisplayName("글 수정")
+    void t2() throws Exception {
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/" + id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "제목 new",
+                                            "content": "내용 new"
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 글이 수정되었습니다.".formatted(id)))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        Post post = postService.findById(id).get();
+
+        assertThat(post.getTitle()).isEqualTo("제목 new");
+        assertThat(post.getContent()).isEqualTo("내용 new");
+    }
 }
