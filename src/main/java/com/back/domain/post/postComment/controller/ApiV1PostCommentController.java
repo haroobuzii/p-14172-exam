@@ -86,4 +86,31 @@ public class ApiV1PostCommentController {
                 "%d번 댓글이 수정되었습니다.".formatted(id)
         );
     }
+
+    public record PostCommentWriteReqBody(
+            @NotBlank
+            @Size(min = 2, max = 100)
+            String content
+    ) {
+    }
+
+    @PostMapping
+    @Transactional
+    public RsData<PostCommentDto> write(
+            @PathVariable int postId,
+            @RequestBody @Valid PostCommentWriteReqBody reqBody
+    ) {
+        Post post = postService.findById(postId).get();
+
+        PostComment postComment = postService.writeComment(post, reqBody.content);
+
+        // 새 댓글의 id 는 INSERT 가 실행되어야 정해지므로 지금 바로 DB 에 반영
+        postService.flush();
+
+        return new RsData<>(
+                "201-1",
+                "%d번 댓글이 작성되었습니다.".formatted(postComment.getId()),
+                new PostCommentDto(postComment)
+        );
+    }
 }

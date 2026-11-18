@@ -51,4 +51,12 @@ public class PostService {
     public void modifyComment(PostComment postComment, String content) {
         postComment.modify(content);
     }
+
+    public PostComment writeComment(Post post, String content) {
+        return post.addComment(content);
+    }
+
+    public void flush() {
+        postRepository.flush();
+    }
 }
