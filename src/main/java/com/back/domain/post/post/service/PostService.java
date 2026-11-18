@@ -34,4 +34,8 @@ public class PostService {
     public Optional<Post> findLatest() {
         return postRepository.findFirstByOrderByIdDesc();
     }
+
+    public void modify(Post post, String title, String content) {
+        post.modify(title, content);
+    }
 }

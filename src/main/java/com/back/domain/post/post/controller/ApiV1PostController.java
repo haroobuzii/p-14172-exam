@@ -33,4 +33,26 @@ public class ApiV1PostController {
                 new PostDto(post)
         );
     }
+
+    public record PostModifyReqBody(
+            String title,
+            String content
+    ) {
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public RsData<Void> modify(
+            @PathVariable int id,
+            @RequestBody PostModifyReqBody reqBody
+    ) {
+        Post post = postService.findById(id).get();
+
+        postService.modify(post, reqBody.title, reqBody.content);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 글이 수정되었습니다.".formatted(id)
+        );
+    }
 }
