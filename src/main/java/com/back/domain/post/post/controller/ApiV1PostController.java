@@ -8,11 +8,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class ApiV1PostController {
     private final PostService postService;
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<PostDto> getItems() {
+        List<Post> items = postService.findAll();
+
+        return items
+                .stream()
+                .map(PostDto::new)
+                .toList();
+    }
 
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
