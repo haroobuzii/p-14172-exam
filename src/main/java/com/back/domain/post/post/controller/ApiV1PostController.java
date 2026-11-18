@@ -1,13 +1,36 @@
 package com.back.domain.post.post.controller;
 
+import com.back.domain.post.post.dto.PostDto;
+import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
+import com.back.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class ApiV1PostController {
     private final PostService postService;
+
+    public record PostWriteReqBody(
+            String title,
+            String content
+    ) {
+    }
+
+    @PostMapping
+    @Transactional
+    public RsData<PostDto> write(
+            @RequestBody PostWriteReqBody reqBody
+    ) {
+        Post post = postService.write(reqBody.title, reqBody.content);
+
+        return new RsData<>(
+                "201-1",
+                "%d번 글이 작성되었습니다.".formatted(post.getId()),
+                new PostDto(post)
+        );
+    }
 }
